@@ -1,13 +1,12 @@
 import {
   CLSMetric,
   FCPMetric,
-  FIDMetric,
   LCPMetric,
   onCLS,
   onFCP,
   onLCP,
 } from "web-vitals";
-import { performanceIndexName } from "./types";
+import { PerformanceIndexName } from "./types";
 
 export class PerformanceTracker {
   private data: Record<string, Record<string, any>>;
@@ -20,7 +19,7 @@ export class PerformanceTracker {
 
   initFCP() {
     onFCP((metric: FCPMetric) => {
-      this.data[performanceIndexName.FCP] = {
+      this.data[PerformanceIndexName.FCP] = {
         name: metric.name,
         value: metric.value,
         rating: metric.rating,
@@ -30,7 +29,7 @@ export class PerformanceTracker {
 
   initCLS() {
     onCLS((metric: CLSMetric) => {
-      this.data[performanceIndexName.CLS] = {
+      this.data[PerformanceIndexName.CLS] = {
         name: metric.name,
         value: metric.value,
         rating: metric.rating,
@@ -40,7 +39,7 @@ export class PerformanceTracker {
 
   initLCP() {
     onLCP((metric: LCPMetric) => {
-      this.data[performanceIndexName.LCP] = {
+      this.data[PerformanceIndexName.LCP] = {
         name: metric.name,
         value: metric.value,
         rating: metric.rating,
