@@ -13,6 +13,7 @@ import {
 } from "./types";
 import { getNT } from "./getNT";
 import { getRF } from "./getRF";
+import { getCacheHit } from "./getCacheHit";
 
 export class PerformanceTracker {
   private data: Record<string, Record<string, any>>;
@@ -61,5 +62,10 @@ export class PerformanceTracker {
   initRF() {
     const resourceFlowTiming: ResourceFlowTiming[] = getRF();
     this.data[PerformanceIndexName.RF] = resourceFlowTiming;
+  }
+
+  initCacheHitRate() {
+    const cacheHitData = getCacheHit();
+    this.data[PerformanceIndexName.CHR] = cacheHitData;
   }
 }

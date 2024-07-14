@@ -13,6 +13,8 @@ export enum PerformanceIndexName {
   NT = "navigation-time",
   /**静态资源加载相关信息 */
   RF = "resource-flow",
+  /**资源缓存命中率 */
+  CHR = "cache-hit-rate",
 }
 
 export interface NTModel {
