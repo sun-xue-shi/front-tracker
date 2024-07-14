@@ -6,7 +6,13 @@ import {
   onFCP,
   onLCP,
 } from "web-vitals";
-import { PerformanceIndexName } from "./types";
+import {
+  PerformanceIndexName,
+  PerformanceNT,
+  ResourceFlowTiming,
+} from "./types";
+import { getNT } from "./getNT";
+import { getRF } from "./getRF";
 
 export class PerformanceTracker {
   private data: Record<string, Record<string, any>>;
@@ -45,5 +51,15 @@ export class PerformanceTracker {
         rating: metric.rating,
       };
     });
+  }
+
+  initNT() {
+    const navigationTiming: PerformanceNT = getNT();
+    this.data[PerformanceIndexName.NT] = navigationTiming;
+  }
+
+  initRF() {
+    const resourceFlowTiming: ResourceFlowTiming[] = getRF();
+    this.data[PerformanceIndexName.RF] = resourceFlowTiming;
   }
 }

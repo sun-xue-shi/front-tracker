@@ -11,7 +11,7 @@ export enum PerformanceIndexName {
   CLS = "layout-shift",
   /**页面请求加载过程的重要指标信息 */
   NT = "navigation-time",
-  /** */
+  /**静态资源加载相关信息 */
   RF = "resource-flow",
 }
 
@@ -30,11 +30,11 @@ export interface NTModel {
  *  @param TCP TCP连接耗时
  *  @param TTFB 请求响应耗时
  *  @param Trans 内容传输耗时
- *  @param Res 资源加载耗时
- *  @param Trans 内容传输耗时
- *  @param DOM DOM解析耗时
+ *  @param Res 资源加载耗时(同步)
+ *  @param DomParse DOM解析耗时
+ *  @param DomReady html加载完成时间
  */
-export interface PerformanceTiming {
+export interface PerformanceNT {
   FP: NTModel;
   TTI: NTModel;
   Load: NTModel;
@@ -42,7 +42,21 @@ export interface PerformanceTiming {
   TTFB: NTModel;
   TCP: NTModel;
   SSL: NTModel;
-  DOM: NTModel;
+  DomParse: NTModel;
+  DomReady: NTModel;
   DNS: NTModel;
   Res: NTModel;
+}
+
+export interface ResourceFlowTiming {
+  name: string;
+  initiatorType: string;
+  transferSize: number;
+  startTime: number;
+  responseEnd: number;
+  DNS: number;
+  TCP: number;
+  SSL: number;
+  TTFB: number;
+  Trans: number;
 }
