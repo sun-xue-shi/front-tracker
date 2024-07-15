@@ -50,6 +50,16 @@ export interface PerformanceNT {
   Res: NTModel;
 }
 
+export interface PerformanceOptions {
+  FCP?: boolean;
+  LCP?: boolean;
+  FID?: boolean;
+  CLS?: boolean;
+  NT?: boolean;
+  RF?: boolean;
+  CHR?: boolean;
+}
+
 export interface ResourceFlowTiming {
   name: string;
   initiatorType: string;

@@ -1,7 +1,7 @@
 /**
  * @returns 资源缓存命中相关计算
  */
-export function getCacheHit() {
+export function getCHR() {
   const cacheData = performance.getEntriesByType("resource");
   let hitQuantity = 0;
 

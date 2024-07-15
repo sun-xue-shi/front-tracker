@@ -9,19 +9,35 @@ import {
 import {
   PerformanceIndexName,
   PerformanceNT,
+  PerformanceOptions,
   ResourceFlowTiming,
 } from "./types";
 import { getNT } from "./getNT";
 import { getRF } from "./getRF";
-import { getCacheHit } from "./getCacheHit";
+import { getCHR } from "./getCHR";
+import { afterLoad } from "../utils/afterLoad";
 
 export class PerformanceTracker {
   private data: Record<string, Record<string, any>>;
   public trackerInstance: any;
+  private options: PerformanceOptions;
 
-  constructor(trackerInstance: any) {
+  constructor(options: PerformanceOptions, trackerInstance: any) {
     this.data = {};
     this.trackerInstance = trackerInstance;
+    this.options = Object.assign(
+      {
+        FCP: true,
+        LCP: true,
+        FID: true,
+        CLS: true,
+        NT: true,
+        RF: true,
+        CHR: true,
+      },
+      options
+    );
+    this.installPerformanceInnerTracker();
   }
 
   initFCP() {
@@ -64,8 +80,20 @@ export class PerformanceTracker {
     this.data[PerformanceIndexName.RF] = resourceFlowTiming;
   }
 
-  initCacheHitRate() {
-    const cacheHitData = getCacheHit();
+  initCHR() {
+    const cacheHitData = getCHR();
     this.data[PerformanceIndexName.CHR] = cacheHitData;
+  }
+
+  installPerformanceInnerTracker() {
+    if (this.options.FCP) this.initFCP();
+    if (this.options.LCP) this.initLCP();
+    if (this.options.CLS) this.initCLS();
+
+    afterLoad(() => {
+      if (this.options.NT) this.initNT();
+      if (this.options.RF) this.initRF();
+      if (this.options.CHR) this.initCHR();
+    });
   }
 }
