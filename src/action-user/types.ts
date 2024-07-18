@@ -32,14 +32,27 @@ export interface UserActionOptions {
   maxBehaviorRecords?: number;
 }
 
+export interface behaviorRecordsOptions {
+  maxBehaviorRecords: number;
+}
+
+//用户行为记录栈
+export interface BehaviorStack {
+  name: UserActionName | string;
+  page: string;
+  timestamp: number | string;
+  value: Record<string, any>;
+}
+
+//页面信息
 /**
- * @param href 整个url 
+ * @param href 整个url
  * @param origin 页面来源：协议 + 域名 + 端口号 -- http://www.example.com:80
  * @param protocol 协议名
  * @param host 域名 + 端口号 -- www.example.com:8080
  * @param hostname 域名 -- www.example.com
  * @param port 端口号
- * @param pathname 路由路径 
+ * @param pathname 路由路径
  * @param search 查询字符串(params)  -- ?name=zilong&age=18
  * @param hash URL中的片段标识符部分，#及其后的部分。
  * @param title 网页标题
