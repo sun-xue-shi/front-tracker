@@ -29,7 +29,7 @@ export interface UserActionOptions {
   elementTrackedList?: string[];
   classTrackedList?: string[];
   eventTrackedList?: string[];
-  maxBehaviorRecords?: number;
+  maxBehaviorRecords: number;
 }
 
 export interface behaviorRecordsOptions {
