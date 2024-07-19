@@ -2,7 +2,7 @@
  * @param PI 页面基本信息
  * @param RCR 路由跳转信息
  * @param OI 用户来路信息
- * @param CBR 点击事件获取
+ * @param DBR DOM操作信息获取
  * @param CDR 自定义获取信息
  * @param HT 请求数据的获取
  */
@@ -10,7 +10,7 @@ export enum UserActionName {
   PI = "page-information",
   OI = "origin-information",
   RCR = "router-change-record",
-  CBR = "click-behavior-record",
+  DBR = "custom-behavior-record",
   CDR = "custom-define-record",
   HT = "http-record",
 }
@@ -26,9 +26,9 @@ export interface UserActionOptions {
   HT?: boolean;
   BS?: boolean;
   PV?: boolean;
-  elementTrackedList?: string[];
-  classTrackedList?: string[];
-  eventTrackedList?: string[];
+  elementTrackedList: string[];
+  classTrackedList: string[];
+  eventTrackedList: string[];
   maxBehaviorRecords: number;
 }
 
@@ -40,7 +40,7 @@ export interface behaviorRecordsOptions {
 export interface BehaviorStack {
   name: UserActionName | string;
   page: string;
-  timestamp: number | string;
+  time: number | string;
   value: Record<string, any>;
 }
 

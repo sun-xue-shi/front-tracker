@@ -16,6 +16,9 @@ export class UserActionTracker {
   public trackerInstance: any;
   private options: UserActionOptions;
   private userBehaviorStack: UserBehaviorStack;
+  private elementTrackedList: string[];
+  private classTrackedList: string[];
+  private eventTrackedList: string[];
 
   constructor(options: UserActionOptions, trackerInstance: any) {
     this.data = {};
@@ -39,6 +42,9 @@ export class UserActionTracker {
 
     //添加replaceState+pushState事件
     addHistoryEvent();
+    this.classTrackedList = this.options.classTrackedList;
+    this.elementTrackedList = this.options.elementTrackedList;
+    this.eventTrackedList = this.options.eventTrackedList;
     this.userBehaviorStack = new UserBehaviorStack({
       maxBehaviorRecords: this.options.maxBehaviorRecords,
     });
@@ -74,7 +80,7 @@ export class UserActionTracker {
       const behaviorStackData: BehaviorStack = {
         name: UserActionName.RCR,
         page: getPageInfo().pathname,
-        timestamp: new Date().getTime(),
+        time: new Date().getTime(),
         value: {
           jumpType: e.type,
         },
@@ -102,5 +108,67 @@ export class UserActionTracker {
     afterLoad(hanlder);
     //进入页面时即可上报
     trackRouteChange(hanlder);
+  }
+
+  initEventHandler() {
+    this.eventTrackedList.forEach((eventItem) => {
+      window.addEventListener(
+        eventItem,
+        (event) => {
+          let target = undefined;
+          if (
+            this.elementTrackedList.includes(
+              (event.target as HTMLElement)?.tagName.toLocaleLowerCase()
+            ) ||
+            Array.from((event.target as HTMLElement)?.classList).find(
+              (className) => {
+                this.classTrackedList.includes(className);
+              }
+            )
+          ) {
+            target = event.target as HTMLElement;
+          }
+
+          if (!target) return;
+
+          const domData = {
+            tagInfo: {
+              id: target.id,
+              classList: Array.from(target.classList),
+              tagName: target.tagName,
+              text: target.textContent,
+            },
+            pageInfo: getPageInfo(),
+            time: new Date().getTime(),
+          };
+
+          if (!this.data[UserActionName.DBR]) {
+            this.data[UserActionName.DBR] = { [eventItem]: [domData] };
+          } else if (!this.data[UserActionName.DBR][eventItem]) {
+            this.data[UserActionName.DBR][eventItem] = [domData];
+          } else {
+            this.data[UserActionName.DBR][eventItem].push(domData);
+          }
+
+          const behaviorStackData = {
+            name: eventItem,
+            page: getPageInfo().pathname,
+            value: {
+              tagInfo: {
+                id: target.id,
+                classList: Array.from(target.classList),
+                tagName: target.tagName,
+                text: target.textContent,
+              },
+              pageInfo: getOriginInfo(),
+            },
+            time: new Date().getTime(),
+          };
+
+          this.userBehaviorStack.push(behaviorStackData);
+        },
+        true
+      );
+    });
   }
 }
