@@ -1,3 +1,4 @@
+import { afterLoad } from "../utils/afterLoad";
 import { getPageInfo } from "./getPageInfo";
 import { addHistoryEvent, trackRouteChange } from "./getRouteChange";
 import { getOriginInfo } from "./grtOriginInfo";
@@ -81,5 +82,21 @@ export class UserActionTracker {
 
       this.userBehaviorStack.push(behaviorStackData);
     });
+  }
+
+  initPV() {
+    const hanlder = () => {
+      const pvInfo = {
+        pageInfo: getPageInfo(),
+        originInfo: getOriginInfo(),
+        time: new Date().getTime(),
+      };
+
+      //上报方法
+    };
+
+    afterLoad(hanlder);
+    //进入页面时即可上报
+    trackRouteChange(hanlder);
   }
 }
