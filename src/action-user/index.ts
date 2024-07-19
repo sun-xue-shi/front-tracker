@@ -84,6 +84,10 @@ export class UserActionTracker {
     });
   }
 
+  /**
+   * 用户访问量
+   */
+
   initPV() {
     const hanlder = () => {
       const pvInfo = {
