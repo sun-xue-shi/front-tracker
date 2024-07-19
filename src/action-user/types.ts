@@ -78,3 +78,13 @@ export interface PageInformation {
   winScreen: string;
   docScreen: string;
 }
+
+/**
+ * 用户来路信息
+ */
+export interface OriginInformation {
+  /**前一个网页地址 */
+  referrer: string;
+  /**来路方式 */
+  type: number | string;
+}

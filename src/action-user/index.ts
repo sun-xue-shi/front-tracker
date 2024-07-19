@@ -1,7 +1,9 @@
 import { getPageInfo } from "./getPageInfo";
 import { addHistoryEvent, trackRouteChange } from "./getRouteChange";
+import { getOriginInfo } from "./grtOriginInfo";
 import {
   BehaviorStack,
+  OriginInformation,
   PageInformation,
   UserActionName,
   UserActionOptions,
@@ -44,6 +46,11 @@ export class UserActionTracker {
   initPI() {
     const pageInfo: PageInformation = getPageInfo();
     this.data[UserActionName.PI] = pageInfo;
+  }
+
+  initOI() {
+    const originInfo: OriginInformation = getOriginInfo();
+    this.data[UserActionName.OI] = originInfo;
   }
 
   initRouteChange() {
