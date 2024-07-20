@@ -88,3 +88,15 @@ export interface OriginInformation {
   /**来路方式 */
   type: number | string;
 }
+
+// XMLHttpRequest 劫持信息
+export interface HttpMetricsData {
+  method: string;
+  url: string | URL;
+  body: Document | XMLHttpRequestBodyInit | null | undefined | ReadableStream;
+  requestTime: number;
+  responseTime: number;
+  status: number;
+  statusText: string;
+  response?: any;
+}

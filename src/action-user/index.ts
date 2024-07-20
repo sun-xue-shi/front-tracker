@@ -2,8 +2,11 @@ import { afterLoad } from "../utils/afterLoad";
 import { getPageInfo } from "./getPageInfo";
 import { addHistoryEvent, trackRouteChange } from "./getRouteChange";
 import { getOriginInfo } from "./grtOriginInfo";
+import { holdFetch } from "./holdFetch";
+import { holdHTTP } from "./holdHTTP";
 import {
   BehaviorStack,
+  HttpMetricsData,
   OriginInformation,
   PageInformation,
   UserActionName,
@@ -170,5 +173,18 @@ export class UserActionTracker {
         true
       );
     });
+  }
+
+  initHttpHandler() {
+    const loadHandler = (httpMetricsData: HttpMetricsData) => {
+      if (!this.data[UserActionName.HT]) {
+        this.data[UserActionName.HT] = [httpMetricsData];
+      } else {
+        this.data[UserActionName.HT].push(httpMetricsData);
+      }
+    };
+
+    holdHTTP(loadHandler);
+    holdFetch(loadHandler);
   }
 }
