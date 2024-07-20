@@ -74,7 +74,7 @@ export interface PageInformation {
   hash: string;
   title: string;
   language: string;
-  userAgent?: string;
+  userAgent?: Record<string, any>;
   winScreen: string;
   docScreen: string;
 }
