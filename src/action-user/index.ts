@@ -107,7 +107,6 @@ export class UserActionTracker {
   /**
    * 用户访问量
    */
-
   private initPV() {
     const hanlder = () => {
       const pvInfo = {

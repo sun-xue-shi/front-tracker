@@ -1,14 +1,29 @@
 {
-  "name": "front-tracker",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "name": "zilong-tracker",
+  "description": "前端监控sdk",
+  "version": "1.0.0",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/ziMuTracker.js",
+  "module": "./dist/ziMuTracker.mjs",
+  "browser": "./dist/ziMuTracker.umd.js",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "build:type": "tsc -p tsconfig.app.json",
+    "build:app": "vite build",
+    "build": "pnpm build:app && pnpm build:type",
+    "lint": "eslint --ext .js,ts --fix src/",
+    "format": "prettier . --write"
   },
+  "keywords": [
+    "前端监控",
+    "错误监控",
+    "用户行为监控",
+    "性能监控",
+    "pv",
+    "uv"
+  ],
+  "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.14.9",
     "@typescript-eslint/eslint-plugin": "^7.14.1",
