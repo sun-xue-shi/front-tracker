@@ -1,5 +1,4 @@
-import { PageInformation } from "../action-user/types";
-import { UserBehaviorStack } from "../action-user/userBehaviorStack";
+import { BehaviorStack, PageInformation } from "../action-user/types";
 
 // 错误类型
 export enum ErrorType {
@@ -22,7 +21,7 @@ export interface ErrorData {
   errorMessage?: string;
   meta: Record<string, any>;
   errorStack?: ErrorStackData[];
-  behaviorStack?: UserBehaviorStack[];
+  behaviorStack?: BehaviorStack[];
   pageInformation?: PageInformation;
 }
 

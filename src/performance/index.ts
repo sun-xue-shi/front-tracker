@@ -16,13 +16,20 @@ import { getNT } from "./getNT";
 import { getRF } from "./getRF";
 import { getCHR } from "./getCHR";
 import { afterLoad } from "../utils/afterLoad";
+import { Tracker } from "../core";
+import { Report } from "../core/type";
 
 export class PerformanceTracker {
   private data: Record<string, Record<string, any>>;
-  public trackerInstance: any;
+  public trackerInstance: Tracker;
   private options: PerformanceOptions;
+  private report: Report;
 
-  constructor(options: PerformanceOptions, trackerInstance: any) {
+  constructor(
+    options: true | PerformanceOptions,
+    report: Report,
+    trackerInstance: Tracker
+  ) {
     this.data = {};
     this.trackerInstance = trackerInstance;
     this.options = Object.assign(
@@ -37,10 +44,13 @@ export class PerformanceTracker {
       },
       options
     );
+    this.report = report;
+    this.trackerInstance = trackerInstance;
     this.installPerformanceInnerTracker();
+    this.performanceDataReport();
   }
 
-  initFCP() {
+  private initFCP() {
     onFCP((metric: FCPMetric) => {
       this.data[PerformanceIndexName.FCP] = {
         name: metric.name,
@@ -50,7 +60,7 @@ export class PerformanceTracker {
     });
   }
 
-  initCLS() {
+  private initCLS() {
     onCLS((metric: CLSMetric) => {
       this.data[PerformanceIndexName.CLS] = {
         name: metric.name,
@@ -60,7 +70,7 @@ export class PerformanceTracker {
     });
   }
 
-  initLCP() {
+  private initLCP() {
     onLCP((metric: LCPMetric) => {
       this.data[PerformanceIndexName.LCP] = {
         name: metric.name,
@@ -70,22 +80,22 @@ export class PerformanceTracker {
     });
   }
 
-  initNT() {
+  private initNT() {
     const navigationTiming: PerformanceNT = getNT();
     this.data[PerformanceIndexName.NT] = navigationTiming;
   }
 
-  initRF() {
+  private initRF() {
     const resourceFlowTiming: ResourceFlowTiming[] = getRF();
     this.data[PerformanceIndexName.RF] = resourceFlowTiming;
   }
 
-  initCHR() {
+  private initCHR() {
     const cacheHitData = getCHR();
     this.data[PerformanceIndexName.CHR] = cacheHitData;
   }
 
-  installPerformanceInnerTracker() {
+  private installPerformanceInnerTracker() {
     if (this.options.FCP) this.initFCP();
     if (this.options.LCP) this.initLCP();
     if (this.options.CLS) this.initCLS();
@@ -94,6 +104,14 @@ export class PerformanceTracker {
       if (this.options.NT) this.initNT();
       if (this.options.RF) this.initRF();
       if (this.options.CHR) this.initCHR();
+    });
+  }
+
+  private performanceDataReport() {
+    window.addEventListener("beforeunload", () => {
+      if (this.data[PerformanceIndexName.FID]) {
+        this.report(this.data, "PERFORMANCE");
+      }
     });
   }
 }

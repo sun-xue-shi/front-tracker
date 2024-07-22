@@ -1,3 +1,5 @@
+import { Tracker } from "../core";
+import { Report } from "../core/type";
 import { afterLoad } from "../utils/afterLoad";
 import { getPageInfo } from "./getPageInfo";
 import { addHistoryEvent, trackRouteChange } from "./getRouteChange";
@@ -16,14 +18,19 @@ import { UserBehaviorStack } from "./userBehaviorStack";
 
 export class UserActionTracker {
   private data: Record<string, Record<string, any>>;
-  public trackerInstance: any;
+  public trackerInstance: Tracker;
   private options: UserActionOptions;
-  private userBehaviorStack: UserBehaviorStack;
+  public userBehaviorStack: UserBehaviorStack;
   private elementTrackedList: string[];
   private classTrackedList: string[];
   private eventTrackedList: string[];
+  private report: Report;
 
-  constructor(options: UserActionOptions, trackerInstance: any) {
+  constructor(
+    options: true | UserActionOptions,
+    report: Report,
+    trackerInstance: Tracker
+  ) {
     this.data = {};
     this.trackerInstance = trackerInstance;
     this.options = Object.assign(
@@ -43,6 +50,7 @@ export class UserActionTracker {
       options
     );
 
+    this.report = report;
     //添加replaceState+pushState事件
     addHistoryEvent();
     this.classTrackedList = this.options.classTrackedList;
@@ -51,19 +59,21 @@ export class UserActionTracker {
     this.userBehaviorStack = new UserBehaviorStack({
       maxBehaviorRecords: this.options.maxBehaviorRecords,
     });
+    this.installUserActionTracker();
+    this.userActionDataReport();
   }
 
-  initPI() {
+  private initPI() {
     const pageInfo: PageInformation = getPageInfo();
     this.data[UserActionName.PI] = pageInfo;
   }
 
-  initOI() {
+  private initOI() {
     const originInfo: OriginInformation = getOriginInfo();
     this.data[UserActionName.OI] = originInfo;
   }
 
-  initRouteChange() {
+  private initRouteChange() {
     trackRouteChange((e: Event) => {
       const routeData = {
         // 跳转的方法 eg:replaceState
@@ -97,7 +107,7 @@ export class UserActionTracker {
    * 用户访问量
    */
 
-  initPV() {
+  private initPV() {
     const hanlder = () => {
       const pvInfo = {
         pageInfo: getPageInfo(),
@@ -113,7 +123,7 @@ export class UserActionTracker {
     trackRouteChange(hanlder);
   }
 
-  initEventHandler() {
+  private initEventHandler() {
     this.eventTrackedList.forEach((eventItem) => {
       window.addEventListener(
         eventItem,
@@ -175,7 +185,7 @@ export class UserActionTracker {
     });
   }
 
-  initHttpHandler() {
+  private initHttpHandler() {
     const loadHandler = (httpMetricsData: HttpMetricsData) => {
       if (!this.data[UserActionName.HT]) {
         this.data[UserActionName.HT] = [httpMetricsData];
@@ -186,5 +196,23 @@ export class UserActionTracker {
 
     holdHTTP(loadHandler);
     holdFetch(loadHandler);
+  }
+
+  private installUserActionTracker() {
+    if (this.options.PI) this.initPI();
+    if (this.options.OI) this.initOI();
+    if (this.options.RCR) this.initRouteChange();
+    if (this.options.DBR) this.initEventHandler();
+    if (this.options.PV) this.initPV();
+    if (this.options.HT) this.initHttpHandler();
+  }
+
+  private userActionDataReport() {
+    window.addEventListener("beforeunload", () => {
+      this.report(this.data, "USER_ACTION");
+      if (this.options.BS) {
+        this.report(this.userBehaviorStack, "USER_BEHAVIOR_STACK");
+      }
+    });
   }
 }

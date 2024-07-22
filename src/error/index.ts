@@ -2,18 +2,25 @@ import { getPageInfo } from "../action-user/getPageInfo";
 import { holdFetch } from "../action-user/holdFetch";
 import { holdHTTP } from "../action-user/holdHTTP";
 import { HttpMetricsData } from "../action-user/types";
+import { Tracker } from "../core";
+import { Report } from "../core/type";
 import { getErrorId } from "../utils/getErrorId";
 import { getErrorKey } from "./getErrorKey";
 import { resolveErrorStack } from "./resolveErrorStack";
 import { ErrorData, ErrorOptions, ErrorType } from "./types";
 
-export class PerformanceTracker {
-  private data: Record<string, Record<string, any>>;
-  public trackerInstance: any;
+export class ErrorTracker {
+  public trackerInstance: Tracker;
   private options: ErrorOptions;
+  private report: Report;
+  private submitErrorIds: string[];
 
-  constructor(options: ErrorOptions, trackerInstance: any) {
-    this.data = {};
+  constructor(
+    options: true | ErrorOptions,
+    report: Report,
+    trackerInstance: Tracker
+  ) {
+    this.submitErrorIds = [];
     this.trackerInstance = trackerInstance;
     this.options = Object.assign(
       {
@@ -25,9 +32,12 @@ export class PerformanceTracker {
       },
       options
     );
+    this.report = report;
+    this.trackerInstance = trackerInstance;
+    this.installErrorTracker();
   }
 
-  initJsError() {
+  private initJsError() {
     window.addEventListener(
       "error",
       (event) => {
@@ -46,15 +56,17 @@ export class PerformanceTracker {
             col: event.colno,
             row: event.lineno,
           },
-          // behaviorStack:
+          behaviorStack:
+            this.trackerInstance?.userActionTracker?.userBehaviorStack?.get(),
         };
         //上报
+        this.errorDataReport(errorData);
       },
       true
     );
   }
 
-  initRsError() {
+  private initRsError() {
     window.addEventListener(
       "error",
       (event) => {
@@ -74,15 +86,17 @@ export class PerformanceTracker {
             html: target.outerHTML,
             type: target.tagName,
           },
-          // behaviorStack:
+          behaviorStack:
+            this.trackerInstance?.userActionTracker?.userBehaviorStack?.get(),
         };
         //上报
+        this.errorDataReport(errorData);
       },
       true
     );
   }
 
-  initPromiseError() {
+  private initPromiseError() {
     window.addEventListener(
       "unhandledrejection",
       (event: PromiseRejectionEvent) => {
@@ -98,14 +112,17 @@ export class PerformanceTracker {
           pageInformation: getPageInfo(),
           meta: {},
           // behaviorStack:
+          behaviorStack:
+            this.trackerInstance?.userActionTracker?.userBehaviorStack?.get(),
         };
         //上报
+        this.errorDataReport(errorData);
       },
       true
     );
   }
 
-  initHttpError() {
+  private initHttpError() {
     const loadhandler = (httpMetricsData: HttpMetricsData) => {
       if (httpMetricsData.status < 400) return;
       const errorData: ErrorData = {
@@ -119,15 +136,17 @@ export class PerformanceTracker {
         meta: {
           httpMetricsData,
         },
-        // behaviorStack:
+        behaviorStack:
+          this.trackerInstance?.userActionTracker?.userBehaviorStack?.get(),
       };
       //上报
+      this.errorDataReport(errorData);
     };
     holdFetch(loadhandler);
     holdHTTP(loadhandler);
   }
 
-  initCorsError() {
+  private initCorsError() {
     window.addEventListener(
       "error",
       (event) => {
@@ -139,11 +158,28 @@ export class PerformanceTracker {
           type: "CorsError",
           pageInformation: getPageInfo(),
           meta: {},
-          // behaviorStack:
+          behaviorStack:
+            this.trackerInstance?.userActionTracker?.userBehaviorStack?.get(),
         };
         //上报
+        this.errorDataReport(errorData);
       },
       true
     );
+  }
+
+  private installErrorTracker() {
+    if (this.options.js) this.initJsError();
+    if (this.options.resource) this.initRsError();
+    if (this.options.promise) this.initPromiseError();
+    if (this.options.http) this.initHttpError();
+    if (this.options.cors) this.initCorsError();
+  }
+
+  private errorDataReport(errorData: ErrorData) {
+    //防止错误重复上报
+    if (this.submitErrorIds.includes(errorData.errorUid)) return;
+    this.submitErrorIds.push(errorData.errorUid);
+    this.report(errorData, "ERROR");
   }
 }
