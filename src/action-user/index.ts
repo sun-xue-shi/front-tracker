@@ -59,6 +59,7 @@ export class UserActionTracker {
     this.userBehaviorStack = new UserBehaviorStack({
       maxBehaviorRecords: this.options.maxBehaviorRecords,
     });
+    (window as any).ziLongSendData = this.sendCustomData.bind(this);
     this.installUserActionTracker();
     this.userActionDataReport();
   }
@@ -115,7 +116,8 @@ export class UserActionTracker {
         time: new Date().getTime(),
       };
 
-      //上报方法
+      //上报
+      this.report(pvInfo, "PV");
     };
 
     afterLoad(hanlder);
@@ -196,6 +198,16 @@ export class UserActionTracker {
 
     holdHTTP(loadHandler);
     holdFetch(loadHandler);
+  }
+
+  private sendCustomData(data: Record<string, any>) {
+    this.report(data, "custom");
+    this.userBehaviorStack.push({
+      name: "custom",
+      page: getPageInfo().pathname,
+      value: data,
+      time: new Date().getTime(),
+    });
   }
 
   private installUserActionTracker() {
