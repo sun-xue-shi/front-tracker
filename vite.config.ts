@@ -3,6 +3,7 @@ import { fileURLToPath, URL } from "url";
 
 export default defineConfig({
   build: {
+    outDir: "dist",
     lib: {
       entry: fileURLToPath(new URL("./src/index.ts", import.meta.url)),
       formats: ["es", "cjs", "umd"],

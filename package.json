@@ -5,11 +5,11 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/ziMuTracker.js",
-  "module": "./dist/ziMuTracker.mjs",
-  "browser": "./dist/ziMuTracker.umd.js",
+  "main": "./dist/ZiLongTracker.js",
+  "module": "./dist/ZiLongTracker.mjs",
+  "browser": "./dist/ZiLongTracker.umd.js",
   "scripts": {
-    "build:type": "tsc -p tsconfig.app.json",
+    "build:type": "tsc -p tsconfig.build.json",
     "build:app": "vite build",
     "build": "pnpm build:app && pnpm build:type",
     "lint": "eslint --ext .js,ts --fix src/",
