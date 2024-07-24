@@ -1,7 +1,7 @@
 {
   "name": "zilong-tracker",
   "description": "前端监控sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "files": [
     "dist"
   ],
